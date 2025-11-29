@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import Screen from "~/components/Screen";
 import Card from "~/components/Card";
 import ListItem from "~/components/ListItem";
@@ -8,6 +9,8 @@ import FAB from "~/components/FAB";
 import { colors, radii, spacing, typography } from "~/theme";
 
 export default function Dashboard() {
+  const router = useRouter();
+
   const stats = useMemo(
     () => [
       {
@@ -77,11 +80,34 @@ export default function Dashboard() {
     []
   );
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuItems = useMemo(
+    () => [
+      {
+        label: "Record Sale",
+        action: () => router.push("/(app)/record-sale"),
+      },
+      {
+        label: "Record Expense",
+        action: () => router.push("/(app)/record-expense"),
+      },
+      {
+        label: "Create IOU",
+        action: () => router.push("/(app)/create-iou"),
+      },
+    ],
+    [router]
+  );
+
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.headerRow}>
-          <Pressable style={styles.iconButton}>
+          <Pressable
+            style={styles.iconButton}
+            onPress={() => setMenuOpen((prev) => !prev)}
+            hitSlop={8}
+          >
             <Feather name="menu" size={22} color={colors.text} />
           </Pressable>
           <Text style={styles.headerTitle}>Dashboard</Text>
@@ -149,6 +175,32 @@ export default function Dashboard() {
           /* TODO: open create transaction */
         }}
       />
+
+      {menuOpen ? (
+        <View style={styles.menuOverlay} pointerEvents="box-none">
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setMenuOpen(false)}
+          />
+          <View style={styles.menuContainer} pointerEvents="box-none">
+            {menuItems.map((item) => (
+              <Pressable
+                key={item.label}
+                style={({ pressed }) => [
+                  styles.menuItem,
+                  pressed && { backgroundColor: "#122032" },
+                ]}
+                onPress={() => {
+                  setMenuOpen(false);
+                  item.action();
+                }}
+              >
+                <Text style={styles.menuText}>{item.label}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+      ) : null}
     </Screen>
   );
 }
@@ -242,5 +294,37 @@ const styles = StyleSheet.create({
   },
   lastItem: {
     borderBottomWidth: 0,
+  },
+  menuOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.25)",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    paddingTop: spacing.xl + 24,
+    paddingLeft: spacing.lg,
+  },
+  menuContainer: {
+    backgroundColor: "#102031",
+    borderRadius: 18,
+    paddingVertical: spacing.xs,
+    width: 200,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 10,
+  },
+  menuItem: {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+  },
+  menuText: {
+    color: colors.text,
+    fontWeight: "600",
+    fontSize: typography.body,
   },
 });
