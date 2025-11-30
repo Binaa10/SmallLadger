@@ -5,35 +5,48 @@ import { useRouter } from "expo-router";
 import Screen from "~/components/Screen";
 import { colors, spacing, typography } from "~/theme";
 
-export default function Login() {
+export default function Signup() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
 
-  const onLogin = () => {
-    // TODO: replace with real auth
+  const onSignup = () => {
+    // TODO: hook up real signup
+    if (!name || !email || !password || password !== confirm) {
+      return;
+    }
     router.replace("/(app)/dashboard");
   };
 
-  const onForgotPassword = () => {
-    router.push("/(auth)/forgot-password");
-  };
-
-  const onContactSupport = () => {
-    router.push("/(auth)/signup");
-  };
+  const goLogin = () => router.replace("/(auth)/login");
 
   return (
     <Screen scroll contentContainerStyle={styles.scrollContent}>
       <View style={styles.content}>
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>trending_up</Text>
+          <Text style={styles.badgeText}>account_circle</Text>
         </View>
-        <Text style={styles.title}>Trader Login</Text>
+        <Text style={styles.title}>Create Account</Text>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Username or Email</Text>
+          <Text style={styles.label}>Full Name</Text>
+          <View style={styles.inputRow}>
+            <TextInput
+              value={name}
+              onChangeText={setName}
+              placeholder="Enter your full name"
+              placeholderTextColor={colors.muted}
+              style={styles.input}
+            />
+          </View>
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Email</Text>
           <View style={styles.inputRow}>
             <TextInput
               value={email}
@@ -41,7 +54,7 @@ export default function Login() {
               autoCapitalize="none"
               autoCorrect={false}
               keyboardType="email-address"
-              placeholder="Enter your username or email"
+              placeholder="Enter your email"
               placeholderTextColor={colors.muted}
               style={styles.input}
             />
@@ -55,12 +68,12 @@ export default function Login() {
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!passwordVisible}
-              placeholder="Enter your password"
+              placeholder="Create a password"
               placeholderTextColor={colors.muted}
               style={styles.input}
             />
             <Pressable
-              onPress={() => setPasswordVisible((prev) => !prev)}
+              onPress={() => setPasswordVisible((p) => !p)}
               hitSlop={12}
             >
               <MaterialIcons
@@ -72,30 +85,38 @@ export default function Login() {
           </View>
         </View>
 
-        <Pressable onPress={onForgotPassword} hitSlop={8}>
-          <Text style={styles.link}>Forgot Password?</Text>
-        </Pressable>
+        <View style={styles.field}>
+          <Text style={styles.label}>Confirm Password</Text>
+          <View style={styles.inputRow}>
+            <TextInput
+              value={confirm}
+              onChangeText={setConfirm}
+              secureTextEntry={!confirmVisible}
+              placeholder="Confirm your password"
+              placeholderTextColor={colors.muted}
+              style={styles.input}
+            />
+            <Pressable
+              onPress={() => setConfirmVisible((p) => !p)}
+              hitSlop={12}
+            >
+              <MaterialIcons
+                name={confirmVisible ? "visibility-off" : "visibility"}
+                size={22}
+                color={colors.muted}
+              />
+            </Pressable>
+          </View>
+        </View>
 
-        <Pressable style={styles.primaryButton} onPress={onLogin}>
-          <Text style={styles.primaryText}>Log In</Text>
-        </Pressable>
-
-        <Text style={styles.orText}>Or log in with</Text>
-
-        <Pressable style={styles.faceIdButton} onPress={() => {}}>
-          <MaterialIcons
-            name="face"
-            size={20}
-            color={colors.text}
-            style={{ marginRight: spacing.sm }}
-          />
-          <Text style={styles.faceIdText}>Login with Face ID</Text>
+        <Pressable style={styles.primaryButton} onPress={onSignup}>
+          <Text style={styles.primaryText}>Sign Up</Text>
         </Pressable>
 
         <Text style={styles.footerText}>
-          Don't have an account?{" "}
-          <Text style={styles.link} onPress={onContactSupport}>
-            Sign Up
+          Already have an account?{" "}
+          <Text style={styles.link} onPress={goLogin}>
+            Log In
           </Text>
         </Text>
       </View>
@@ -158,7 +179,6 @@ const styles = StyleSheet.create({
   link: {
     color: colors.primary,
     fontWeight: "600",
-    alignSelf: "flex-end",
   },
   primaryButton: {
     marginTop: spacing.sm,
@@ -175,26 +195,6 @@ const styles = StyleSheet.create({
   primaryText: {
     color: "#ffffff",
     fontWeight: "700",
-    fontSize: typography.body,
-  },
-  orText: {
-    color: colors.muted,
-    textAlign: "center",
-    marginTop: spacing.lg,
-  },
-  faceIdButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.xs,
-    borderColor: "#1c2a3d",
-    borderWidth: 1,
-    borderRadius: 18,
-    paddingVertical: spacing.md,
-    marginTop: spacing.sm,
-  },
-  faceIdText: {
-    color: colors.text,
     fontSize: typography.body,
   },
   footerText: {

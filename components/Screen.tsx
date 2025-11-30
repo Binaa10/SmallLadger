@@ -5,20 +5,39 @@ import {
   ViewProps,
   StyleSheet,
   StatusBar,
+  ScrollView,
 } from "react-native";
 import { colors, spacing } from "~/theme";
 
 export default function Screen({
   style,
   children,
+  scroll,
+  contentContainerStyle,
   ...rest
-}: ViewProps & { children?: React.ReactNode }) {
+}: ViewProps & {
+  children?: React.ReactNode;
+  scroll?: boolean;
+  contentContainerStyle?: any;
+}) {
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" />
-      <View style={[styles.container, style]} {...rest}>
-        {children}
-      </View>
+      {scroll ? (
+        <ScrollView
+          style={[styles.container]}
+          contentContainerStyle={contentContainerStyle}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          {...rest}
+        >
+          {children}
+        </ScrollView>
+      ) : (
+        <View style={[styles.container, style]} {...rest}>
+          {children}
+        </View>
+      )}
     </SafeAreaView>
   );
 }

@@ -1,5 +1,12 @@
 import React, { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Alert,
+} from "react-native";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import Screen from "~/components/Screen";
@@ -81,20 +88,18 @@ export default function Dashboard() {
   );
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const menuItems = useMemo(
     () => [
-      {
-        label: "Record Sale",
-        action: () => router.push("/(app)/record-sale"),
-      },
+      { label: "Dashboard", action: () => router.push("/(app)/dashboard") },
+      { label: "Record Sale", action: () => router.push("/(app)/record-sale") },
       {
         label: "Record Expense",
         action: () => router.push("/(app)/record-expense"),
       },
-      {
-        label: "Create IOU",
-        action: () => router.push("/(app)/create-iou"),
-      },
+      { label: "Create IOU", action: () => router.push("/(app)/create-iou") },
+      { label: "Login", action: () => router.push("/(auth)/login") },
+      { label: "Onboarding", action: () => router.push("/onboarding") },
     ],
     [router]
   );
@@ -111,7 +116,11 @@ export default function Dashboard() {
             <Feather name="menu" size={22} color={colors.text} />
           </Pressable>
           <Text style={styles.headerTitle}>Dashboard</Text>
-          <Pressable style={styles.iconButton}>
+          <Pressable
+            style={styles.iconButton}
+            onPress={() => setProfileMenuOpen((p) => !p)}
+            hitSlop={8}
+          >
             <Feather name="user" size={22} color={colors.text} />
           </Pressable>
         </View>
@@ -180,24 +189,74 @@ export default function Dashboard() {
         <View style={styles.menuOverlay} pointerEvents="box-none">
           <Pressable
             style={StyleSheet.absoluteFill}
-            onPress={() => setMenuOpen(false)}
+            onPress={() => {
+              setMenuOpen(false);
+              setProfileMenuOpen(false);
+            }}
           />
-          <View style={styles.menuContainer} pointerEvents="box-none">
+          <View style={styles.sidebar}>
+            <View style={styles.sidebarHeader}>
+              <Text style={styles.sidebarTitle}>Navigation</Text>
+              <Pressable
+                hitSlop={8}
+                onPress={() => setMenuOpen(false)}
+                style={styles.closeButton}
+              >
+                <Feather name="x" size={18} color={colors.text} />
+              </Pressable>
+            </View>
             {menuItems.map((item) => (
               <Pressable
                 key={item.label}
                 style={({ pressed }) => [
-                  styles.menuItem,
-                  pressed && { backgroundColor: "#122032" },
+                  styles.sidebarItem,
+                  pressed && { backgroundColor: "#0e1f33" },
                 ]}
                 onPress={() => {
                   setMenuOpen(false);
                   item.action();
                 }}
               >
-                <Text style={styles.menuText}>{item.label}</Text>
+                <Text style={styles.sidebarText}>{item.label}</Text>
               </Pressable>
             ))}
+          </View>
+        </View>
+      ) : null}
+      {profileMenuOpen ? (
+        <View style={styles.profileOverlay} pointerEvents="box-none">
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setProfileMenuOpen(false)}
+          />
+          <View style={styles.profileMenu}>
+            <Pressable
+              style={styles.profileItem}
+              onPress={() => {
+                setProfileMenuOpen(false);
+                router.push("/(auth)/login");
+              }}
+            >
+              <Text style={styles.profileText}>Profile</Text>
+            </Pressable>
+            <Pressable
+              style={styles.profileItem}
+              onPress={() => {
+                setProfileMenuOpen(false);
+                Alert.alert("Theme", "Dark mode toggled (demo)");
+              }}
+            >
+              <Text style={styles.profileText}>Toggle Theme</Text>
+            </Pressable>
+            <Pressable
+              style={styles.profileItem}
+              onPress={() => {
+                setProfileMenuOpen(false);
+                Alert.alert("About", "MicroLedger v1.0 — Stay sharp!");
+              }}
+            >
+              <Text style={styles.profileText}>About</Text>
+            </Pressable>
           </View>
         </View>
       ) : null}
@@ -304,27 +363,78 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.25)",
     justifyContent: "flex-start",
     alignItems: "flex-start",
-    paddingTop: spacing.xl + 24,
-    paddingLeft: spacing.lg,
   },
-  menuContainer: {
-    backgroundColor: "#102031",
-    borderRadius: 18,
-    paddingVertical: spacing.xs,
-    width: 200,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 10,
-  },
-  menuItem: {
+  sidebar: {
+    width: 260,
+    backgroundColor: "#0c1726",
     paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
+    height: "100%",
+    shadowColor: "#000",
+    shadowOpacity: 0.35,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 12,
   },
-  menuText: {
+  sidebarHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.sm,
+  },
+  sidebarTitle: {
+    color: colors.text,
+    fontSize: typography.h3,
+    fontWeight: "700",
+  },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#102031",
+  },
+  sidebarItem: {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: 12,
+  },
+  sidebarText: {
     color: colors.text,
     fontWeight: "600",
     fontSize: typography.body,
+  },
+  profileMenu: {
+    position: "absolute",
+    top: spacing.xl + 8,
+    right: spacing.md,
+    backgroundColor: "#0c1726",
+    borderRadius: 12,
+    paddingVertical: 6,
+    minWidth: 160,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
+    zIndex: 50,
+  },
+  profileOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 40,
+  },
+  profileItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  profileText: {
+    color: colors.text,
+    fontWeight: "600",
   },
 });
