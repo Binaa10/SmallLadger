@@ -92,13 +92,24 @@ export default function Dashboard() {
   const menuItems = useMemo(
     () => [
       { label: "Dashboard", action: () => router.push("/(app)/dashboard") },
+      {
+        label: "Transactions",
+        action: () => router.push("/(app)/transactions"),
+      },
       { label: "Record Sale", action: () => router.push("/(app)/record-sale") },
       {
         label: "Record Expense",
         action: () => router.push("/(app)/record-expense"),
       },
       { label: "Create IOU", action: () => router.push("/(app)/create-iou") },
+      { label: "IOU Details", action: () => router.push("/(app)/iou-details") },
+      {
+        label: "Profile Settings",
+        action: () => router.push("/(app)/profile-settings"),
+      },
+      { label: "Sync Status", action: () => router.push("/(app)/sync-status") },
       { label: "Login", action: () => router.push("/(auth)/login") },
+      { label: "Signup", action: () => router.push("/(auth)/signup") },
       { label: "Onboarding", action: () => router.push("/onboarding") },
     ],
     [router]
